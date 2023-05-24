@@ -96,4 +96,3 @@ admin.site.register(Profile, ProfileAdmin)
 
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
-
