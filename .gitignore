@@ -1,3 +1,5 @@
 venv
 *.sqlite3
-studentsevents/app/migrations/*
+studentsevents/events/migrations/*
+__pycache__
+.idea
