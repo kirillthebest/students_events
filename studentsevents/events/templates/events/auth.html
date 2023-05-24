@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="ru">
   <head>
@@ -45,7 +46,7 @@
   </script>
   <style>
         body {
-            background-image: url(https://vuzopedia.ru/storage/app/uploads/public/5a3/801/c60/5a3801c60aca5553352854.jpg);
+            background-image: url({% static 'images/background.jpg' %});
             background-size: cover;
             background-repeat: no-repeat;
             width: 100%;

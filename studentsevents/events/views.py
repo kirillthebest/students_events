@@ -4,6 +4,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from events.models import Profile
 
+def show_events_page(request):
+    return render(request, 'events/events.html')
+
+
+def show_student_page(request):
+    return render(request, 'events/student.html')
+
+
+def show_teacher_page(request):
+    return render(request, 'events/teacher.html')
+
 
 # Create your views here.
 def show_login_page(request):
@@ -31,7 +42,7 @@ def auth(request):
                 if user is not None:
                     if get_object_or_404(Profile, user_id=user.id):
                         login(request, user)
-                        return HttpResponse('ЗАЕБИСЬ!!!')
+                        return redirect('events_page')
                     else:
                         form.add_error(None, 'Неверные данные!')
                 else:
