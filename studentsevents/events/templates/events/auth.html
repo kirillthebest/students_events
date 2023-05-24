@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <title>Регистрация</title>
+  </head>
+  <body>
+
+  <div class="container">
+
+    <form action="{% url 'auth' %}" method="post">
+        {% csrf_token %}
+        <h2>Авторизация</h2>
+      <div class="mb-3">
+        <input name="username" type="text" value="{{ form.username.value|default_if_none:'' }}" class="form-control" placeholder="Логин">
+      </div>
+      <div class="mb-3">
+        <input name="password" type="password" value="{{ form.password.value|default_if_none:'' }}" class="form-control" placeholder="Пароль">
+      </div>
+   <div class="div-button">
+       <button type="submit" class="btn btn-primary"><b>Вход</b></button>
+   </div>
+    </form>
+
+       <div class="errors-block">
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+  <script>
+      $('.errors-block').delay(3000).fadeOut('slow');
+  </script>
+  <style>
+        body {
+            background-image: url(https://vuzopedia.ru/storage/app/uploads/public/5a3/801/c60/5a3801c60aca5553352854.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100vh;
+        }
+
+        h2 {
+            font-weight:700;
+            text-align:center;
+            padding-bottom: 20px;
+        }
+
+        .div-button {
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding-top: 25px;
+        }
+
+        button
+        {
+            width:35%;
+        }
+
+        .errors-block {
+            display:flex;
+        }
+
+        html,body{
+          height:100%;
+          padding:0;
+          margin:0;
+        }
+        * {
+          box-sizing:border-box;
+        }
+        form {
+          padding-top: 50px;
+          padding-left: 25px;
+          padding-right: 25px;
+          width:400px;
+          height:325px;
+          background-color: rgba(255,255,255,0.7);
+          border-radius: 20px;
+        }
+
+        .container{
+          width:100%;
+          height:100%;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          flex-direction: column;
+          row-gap:20px;
+
+        }
+
+
+
+    </style>
+  </body>
+</html>
