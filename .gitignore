@@ -1,6 +1,9 @@
 venv
 *.sqlite3
 studentsevents/events/migrations/*
+studentsevents/events/__pycache__/*
+studentsevents/studentsevents/__pycache__/*
 !studentsevents/events/migrations/__init__.py
 __pycache__/*
 .idea
+studentsevents/uploads/*

@@ -39,11 +39,17 @@ admin.site.register(EventType)
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('name', 'event_type', 'event_date')
+    search_fields = ('name', )
+    list_display = ('name', 'event_type', 'event_date', 'event_end')
 
 
 admin.site.register(Event, EventAdmin)
 
+class ProfileEventAdmin(admin.ModelAdmin):
+    search_fields = ('profile__user__username', 'profile__user__first_name','profile__user__last_name','event__name',)
+    list_display = ('profile', 'event', 'score', 'document')
+
+admin.site.register(ProfileEvent, ProfileEventAdmin)
 
 class UserTypeFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
@@ -72,22 +78,23 @@ class EventInline(admin.StackedInline):
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'group')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'group__name')
+    list_display = ('name_text', 'group')
     list_filter = (UserTypeFilter, )
 
     def get_list_display(self, request):
         if 'user_type' in request.GET:
             if request.GET['user_type'] == 'teacher':
-                return ('user',)
-        return ('user', 'group')
+                return ('name_text',)
+        return ('name_text', 'group')
 
     def get_fields(self, request, obj=None):
-        if obj.user.is_superuser:
+        if obj and obj.user.is_superuser:
             return ('user', )
         return ('user', 'group')
 
     def get_inlines(self, request, obj):
-        if not obj.user.is_superuser:
+        if obj and not obj.user.is_superuser:
             return [EventInline]
         return []
 

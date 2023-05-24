@@ -1,25 +1,28 @@
 {% extends 'events/layout.html' %}
 
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.css">
+<script src="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script>
+
 <div style="padding-left:70px; padding-right:70px;">
 <h1>Мои мероприятия</h1>
 <br>
-    <form class="form-inline">
+    <form class="form-inline" action="/student">
 
   <div class="input-group mb-2 mr-sm-2">
 
   </div>
 
   <div class="form-check mb-2 mr-sm-2">
-    <label style="padding-right:15px;">Дата от</label> <input type="date" class="form-control">
+    <label style="padding-right:15px;">Дата от</label> <input type="date" name="event__event_date__gte" value="{{ date_from }}" class="form-control">
   </div>
 
 <div class="form-check mb-2 mr-sm-2">
-    <label style="padding-right:15px;">Дата до</label> <input type="date" class="form-control">
+    <label style="padding-right:15px;">Дата до</label> <input type="date" name="event__event_date__lte" value="{{ date_to }}" class="form-control">
   </div>
 
         <div class="form-check pr-4 mb-2 mr-sm-2 pl-4">
-  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+  <input class="form-check-input" type="checkbox" name="only_active" {% if only_active%} checked {%endif%} value="1" id="defaultCheck1">
   <label class="form-check-label" for="defaultCheck1">
     Активные
   </label>
@@ -29,57 +32,63 @@
   <button type="submit" class="btn btn-outline-primary mb-2">Показать</button>
 </form>
 <br>
-<table class="table table-hover">
+<table class="table table-hover" id="table"
+  data-toggle="table">
   <thead>
     <tr>
       <th scope="col">Мероприятие</th>
-      <th scope="col">Дата</th>
-      <th scope="col">Баллы</th>
+      <th scope="col" data-field="date" data-sortable="true">Дата</th>
+      <th scope="col" data-field="score" data-sortable="true">Баллы</th>
+      <th scope="col" data-field="doc" data-sortable="true">Служебная записка</th>
     </tr>
   </thead>
   <tbody>
-    <tr class="event-modal" data-toggle="modal" data-target="#exampleModal" data-id="ISBN564541">
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+    {% for event in events %}
+    <tr class="{% if not event.document %}event-modal{%endif%} {%if not event.document %}table-warning{%elif not event.score %}table-primary{%else%}table-success{%endif%}" {% if not event.document %} data-toggle="modal" data-target="#exampleModal" data-id="{{ event.id }}" {%endif%}>
+      <td>{{ event.event.name }}</td>
+      <td>{{ event.event.event_date }}</td>
+      <td>{{ event.score|default:'-' }}</td>
+      <td>
+        {% if event.document%}
+        <a href="{{ event.document.url }}">Скачать</a>
+        {%else%}
+        -
+        {%endif%}
+      </td>
     </tr>
-    <tr class="event-modal" data-toggle="modal" data-target="#exampleModal" data-id="324324534">
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr class="event-modal" data-toggle="modal" data-target="#exampleModal" data-id="12312312">
-      <td>Larry</td>
-      <td>the Bird</td>
-      <td>@twitter</td>
-    </tr>
+    {% endfor %}
   </tbody>
 </table>
     <br><br>
-    <b style="font-size:30px;">Мой рейтинг: 45 баллов</b>
+    <b style="font-size:30px;">Мой рейтинг: {{ rating }}</b>
     </div>
 <script>
     $(document).on("click", ".event-modal", function () {
-     console.log($(this).data('id'))
-});
+         $('.input-event-id').val($(this).data('id'))
+    });
 </script>
 
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Добавить служебную записку</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <form method="POST" enctype="multipart/form-data" action="{% url 'upload_event_document' %}">
+        {% csrf_token %}
       <div class="modal-body">
-        ...
+        Загрузите файл
+        <input type="file" required name="document" class="form-control">
+        <input type="hidden" class="input-event-id" name="event_id" value="">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">отмена</button>
+        <button type="submit" class="btn btn-primary">Отправить</button>
       </div>
+        </form>
     </div>
   </div>
 </div>

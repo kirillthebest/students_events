@@ -1,72 +1,101 @@
 {% extends 'events/layout.html' %}
 
 {% block content %}
-<div style="padding-left:70px; padding-right:70px;">
-<h1>Список мероприятий</h1>
-<br>
-    <form>
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.css">
+<script src="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script>
 
-<div class="form-inline">
+<div style="padding-left:70px; padding-right:70px;">
+<h1>Статистика мероприятий</h1>
+<br>
+    <form action="/teacher">
+        <div class="form-inline">
   <div class="form-check mb-2 mr-sm-2">
-    <label style="padding-right:15px;">Дата от</label> <input type="date" class="form-control">
+    <label style="padding-right:15px;">Дата от</label> <input type="date" name="event__event_date__gte" value="{{ date_from }}" class="form-control">
   </div>
 
 <div class="form-check mb-2 mr-sm-2">
-    <label style="padding-right:15px;">Дата до</label> <input type="date" class="form-control">
+    <label style="padding-right:15px;">Дата до</label> <input type="date" name="event__event_date__lte" value="{{ date_to }}" class="form-control">
   </div>
 
         <div class="form-check pr-4 mb-2 mr-sm-2 pl-4">
-  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+  <input class="form-check-input" type="checkbox" name="only_active" {% if only_active%} checked {%endif%} value="1" id="defaultCheck1">
   <label class="form-check-label" for="defaultCheck1">
     Активные
   </label>
-</div>
-</div>
-
-        <div class="form-inline">
+            </div>
+        </div>
+            <div class="form-inline">
   <div class="form-check mb-2 mr-sm-2">
-      <label style="padding-right:15px;">Студент</label> <select class="form-control"><option>Иванов Иван</option></select>
+      <label style="padding-right:15px;">Студент</label> <select id="profile-select" name="profile_id" class="form-control">
+      <option id="profile-select-default" selected disabled>Выберите</option>
+      {% for student in students %}
+      {% if student_selected == student.id %}
+      <option selected="selected" value="{{ student.id }}">{{ student }}</option>
+      {% else %}
+      <option value="{{ student.id }}">{{ student }}</option>
+      {% endif %}
+      {% endfor %}
+  </select>
   </div>
+
 
 <div class="form-check mb-2 mr-sm-2">
-    <label style="padding-right:15px;">Группа</label> <select class="form-control"><option>ИСТ-341</option></select>
+    <label style="padding-right:15px;">Группа</label> <select id="group-select" name="profile__group_id" class="form-control">
+    <option id="group-select-default" selected disabled>Выберите</option>
+    {% for group in groups %}
+      <option {% if group_selected == group.id %} selected="selected" {%endif%} value="{{ group.id }}">{{ group.name }}</option>
+      {% endfor %}
+</select>
   </div>
 
 </div>
+   <script>
+        $('select').change(function() {
+            $('select').not(this)
+                .children('option')
+                .attr('selected', false)
+            $('select').not(this)
+                .children('option').siblings().eq(0).attr('selected', true)
+        });
+
+   </script>
 
   <button type="submit" class="btn btn-outline-primary mb-2">Показать</button>
 </form>
 <br>
-<table class="table">
+<table class="table table-hover" id="table"
+  data-toggle="table">
   <thead>
     <tr>
       <th scope="col">Мероприятие</th>
-      <th scope="col">Дата</th>
-      <th scope="col">Баллы</th>
+      <th scope="col" data-field="date" data-sortable="true">Дата</th>
+        <th scope="col" data-field="student" data-sortable="true">Студент</th>
+        <th scope="col" data-field="group" data-sortable="true">Группа</th>
+      <th scope="col" data-field="score" data-sortable="true">Баллы</th>
+      <th scope="col" data-field="doc" data-sortable="true">Служебная записка</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+    {% for event in events %}
+    <tr class="{%if not event.document %}table-warning{%elif not event.score %}table-primary{%else%}table-success{%endif%}">
+      <td>{{ event.event.name }}</td>
+      <td>{{ event.event.event_date }}</td>
+        <td>{{ event.profile }}</td>
+        <td>{{ event.profile.group.name }}</td>
+      <td>{{ event.score|default:'-' }}</td>
+      <td>
+        {% if event.document%}
+        <a href="{{ event.document.url }}">Скачать</a>
+        {%else%}
+        -
+        {%endif%}
+      </td>
     </tr>
-    <tr>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <td>Larry</td>
-      <td>the Bird</td>
-      <td>@twitter</td>
-    </tr>
+    {% endfor %}
   </tbody>
 </table>
     <br><br>
-    <b style="font-size:30px;">Рейтинг студента Иванов Иван: 45 баллов</b>
-    <br>
-    <b style="font-size:30px;">Рейтинг группы ИСТ-341: 45 баллов</b>
-
+    <b style="font-size:30px;">{{ rating }}</b>
     </div>
+
 {% endblock %}
